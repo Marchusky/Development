@@ -44,22 +44,22 @@ void j1Map::PropagateBFS()
 		iPoint current;
 		frontier.Pop(current);
 
-		p2List<iPoint> neighbours;
+		p2List<iPoint> neighbors;
 
-		neighbours.add({ current.x + 1,current.y });
-		neighbours.add({ current.x ,current.y + 1});
-		neighbours.add({ current.x - 1,current.y });
-		neighbours.add({ current.x,current.y - 1 });
+		neighbors.add({ current.x + 1,current.y });
+		neighbors.add({ current.x ,current.y + 1});
+		neighbors.add({ current.x - 1,current.y });
+		neighbors.add({ current.x,current.y - 1 });
 
 
 	// TODO 2: For each neighbor, if not visited, add it
 	// to the frontier queue and visited list
-		for (p2List_item<iPoint>* new_neighbours = neighbours.start; new_neighbours != nullptr; new_neighbours = new_neighbours->next)
+		for (p2List_item<iPoint>* new_neighbors = neighbors.start; new_neighbors != nullptr; new_neighbors = new_neighbors->next)
 		{
-			if (visited.find(new_neighbours->data) == -1)
+			if (visited.find(new_neighbors->data) == -1)
 			{
-				frontier.Push(new_neighbours->data);
-				visited.add(new_neighbours->data);
+				frontier.Push(new_neighbors->data);
+				visited.add(new_neighbors->data);
 			}
 		}
 	}
