@@ -22,51 +22,100 @@ bool j1Map::Awake(pugi::xml_node& config)
 	bool ret = true;
 
 	folder.create(config.child("folder").child_value());
-	ResetBFS();
+	ResetPath();
 
 	return ret;
 }
 
-void j1Map::ResetBFS()
+bool j1Map::Start()
+{
+	tile_x = App->tex->Load("maps/x.png");
+	return true;
+}
+
+void j1Map::ResetPath()
 {
 	frontier.Clear();
 	visited.clear();
-	frontier.Push(iPoint(19, 4));
+	breadcrumbs.clear();
+	frontier.Push(iPoint(19, 4), 0);
 	visited.add(iPoint(19, 4));
+	breadcrumbs.add(iPoint(19, 4));
+	memset(cost_so_far, 0, sizeof(uint) * COST_MAP * COST_MAP);
+}
+
+void j1Map::Path(int x, int y)
+{
+	path.Clear();
+	iPoint goal = WorldToMap(x, y);
+
+	// TODO 2: Follow the breadcrumps to goal back to the origin
+	// add each step into "path" dyn array (it will then draw automatically)
+	iPoint current = goal;
+	path.PushBack(current);
+
+	while (current != breadcrumbs.start->data && MovementCost(goal.x,goal.y) > 0 && visited.find(goal) != -1)
+	{
+		current = breadcrumbs[visited.find(current)];
+		path.PushBack(current);
+	}
+	path.PushBack(breadcrumbs.start->data);
+}
+
+void j1Map::PropagateDijkstra()
+{
+	// TODO 3: Taking BFS as a reference, implement the Dijkstra algorithm
+	// use the 2 dimensional array "cost_so_far" to track the accumulated costs
+	// on each cell (is already reset to 0 automatically)
+	
+}
+
+int j1Map::MovementCost(int x, int y) const
+{
+	int ret = -1;
+
+	if (x >= 0 && x < data.width && y >= 0 && y < data.height)
+	{
+		int id = data.layers.start->next->data->Get(x, y);
+
+		if (id == 0)
+			ret = 3;
+		else
+			ret = 0;
+	}
+
+	return ret;
 }
 
 void j1Map::PropagateBFS()
 {
-	// TODO 1: If frontier queue contains elements
-	// pop the last one and calculate its 4 neighbors
-	while (frontier.start != nullptr)
+	// TODO 1: Record the direction to the previous node 
+	// with the new list "breadcrumps"
+	iPoint curr;
+	if (frontier.Pop(curr))
 	{
-		iPoint current;
-		frontier.Pop(current);
+		iPoint neighbors[4];
+		neighbors[0].create(curr.x + 1, curr.y + 0);
+		neighbors[1].create(curr.x + 0, curr.y + 1);
+		neighbors[2].create(curr.x - 1, curr.y + 0);
+		neighbors[3].create(curr.x + 0, curr.y - 1);
 
-		p2List<iPoint> neighbors;
-
-		neighbors.add({ current.x + 1,current.y });
-		neighbors.add({ current.x ,current.y + 1});
-		neighbors.add({ current.x - 1,current.y });
-		neighbors.add({ current.x,current.y - 1 });
-
-
-	// TODO 2: For each neighbor, if not visited, add it
-	// to the frontier queue and visited list
-		for (p2List_item<iPoint>* new_neighbors = neighbors.start; new_neighbors != nullptr; new_neighbors = new_neighbors->next)
+		for (uint i = 0; i < 4; ++i)
 		{
-			if (visited.find(new_neighbors->data) == -1)
+			if (MovementCost(neighbors[i].x, neighbors[i].y) > 0)
 			{
-				frontier.Push(new_neighbors->data);
-				visited.add(new_neighbors->data);
-				
+				if (visited.find(neighbors[i]) == -1)
+				{
+					frontier.Push(neighbors[i], 0);
+					visited.add(neighbors[i]);
+					breadcrumbs.add(curr);
+				}
 			}
 		}
 	}
 }
 
-void j1Map::DrawBFS()
+void j1Map::DrawPath()
 {
 	iPoint point;
 
@@ -98,13 +147,12 @@ void j1Map::DrawBFS()
 		App->render->Blit(tileset->texture, pos.x, pos.y, &r);
 	}
 
-}
-
-bool j1Map::IsWalkable(int x, int y) const
-{
-	// TODO 3: return true only if x and y are within map limits
-	// and the tile is walkable (tile id 0 in the navigation layer)
-	return true;
+	// Draw path
+	for (uint i = 0; i < path.Count(); ++i)
+	{
+		iPoint pos = MapToWorld(path[i].x, path[i].y);
+		App->render->Blit(tile_x, pos.x, pos.y);
+	}
 }
 
 void j1Map::Draw()
@@ -139,7 +187,7 @@ void j1Map::Draw()
 		}
 	}
 
-	DrawBFS();
+	DrawPath();
 }
 
 int Properties::Get(const char* value, int default_value) const
@@ -204,7 +252,7 @@ iPoint j1Map::WorldToMap(int x, int y) const
 
 	if(data.type == MAPTYPE_ORTHOGONAL)
 	{
-		ret.x = x / data.tile_width;
+		ret.x = (x / data.tile_width);
 		ret.y = y / data.tile_height;
 	}
 	else if(data.type == MAPTYPE_ISOMETRIC)
@@ -212,7 +260,7 @@ iPoint j1Map::WorldToMap(int x, int y) const
 		
 		float half_width = data.tile_width * 0.5f;
 		float half_height = data.tile_height * 0.5f;
-		ret.x = int( (x / half_width + y / half_height) / 2);
+		ret.x = int( (x / half_width + y / half_height) / 2) - 1;
 		ret.y = int( (y / half_height - (x / half_width)) / 2);
 	}
 	else
