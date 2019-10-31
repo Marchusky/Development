@@ -54,7 +54,7 @@ void j1Map::Path(int x, int y)
 	iPoint current = goal;
 	path.PushBack(current);
 
-	while (current != breadcrumbs.start->data && MovementCost(goal.x,goal.y) > 0 && visited.find(goal) != -1)
+	while (/*current != breadcrumbs.start->data &&*/  visited.find(goal) != -1)
 	{
 		current = breadcrumbs[visited.find(current)];
 		path.PushBack(current);
@@ -67,7 +67,33 @@ void j1Map::PropagateDijkstra()
 	// TODO 3: Taking BFS as a reference, implement the Dijkstra algorithm
 	// use the 2 dimensional array "cost_so_far" to track the accumulated costs
 	// on each cell (is already reset to 0 automatically)
-	
+	iPoint curr;
+
+	if (frontier.Pop(curr))
+	{
+		iPoint neighbors[4];
+		neighbors[0].create(curr.x + 1, curr.y + 0);
+		neighbors[1].create(curr.x + 0, curr.y + 1);
+		neighbors[2].create(curr.x - 1, curr.y + 0);
+		neighbors[3].create(curr.x + 0, curr.y - 1);
+		for (uint i = 0; i < 4; ++i)
+		{
+			if (MovementCost(neighbors[i].x, neighbors[i].y) > 0)
+			{
+				if (visited.find(neighbors[i]) == -1)
+				{
+					uint new_cost = cost_so_far[curr.x][curr.y] + MovementCost(curr.x, curr.y);
+					if (cost_so_far[neighbors[i].x][neighbors[i].y] < 0 || new_cost < cost_so_far[neighbors[i].x][neighbors[i].y])
+					{
+						cost_so_far[neighbors[i].x][neighbors[i].y] = new_cost;
+						frontier.Push(neighbors[i], new_cost);
+						visited.add(neighbors[i]);
+						breadcrumbs.add(curr);
+					}
+				}
+			}
+		}
+	}
 }
 
 int j1Map::MovementCost(int x, int y) const
