@@ -207,10 +207,17 @@ int j1PathFinding::CreatePath(const iPoint& origin, const iPoint& destination)
 			PathList adjacent;
 			node->data.FindWalkableAdjacents(adjacent);
 			// TODO 6: Iterate adjancent nodes:
-			// ignore nodes in the closed list
-			// If it is NOT found, calculate its F and add it to the open list
-			// If it is already in the open list, check if it is a better path (compare G)
-			// If it is a better path, Update the parent
+			p2List_item<PathNode>* item = adjacent.list.start;
+
+			for (; item; item->next)
+			{
+				// ignore nodes in the closed list
+
+
+				// If it is NOT found, calculate its F and add it to the open list
+				// If it is already in the open list, check if it is a better path (compare G)
+				// If it is a better path, Update the parent
+			}
 		}
 	}
 
