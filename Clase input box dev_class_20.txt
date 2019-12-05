@@ -1,0 +1,40 @@
+Handout in Development-class 17 Handout
+
+Input Box parente de:
+Label + text
+
+Detect keyboard input as a string, and arrows, caps, and rest input
+to edit the text inside the box.
+
+"Careful, if you open the solution with double click in the middle
+of the screen the SDL detects the second click as a drag and it bugs."
+
+""%" and "&" crashes the game, this game is permited in the delivery."
+
+
+Today's class:
+Create a new class (InputBox) with an image and a label, both children
+of Input box.
+
+Add new event "focus", when clicked -> focus
+
+The text can accept special characters (like in the slide).
+
+Las letras estan en un array y dependiendo de donde este el cursor
+debes poder borrar (y la posicion del cursor es -1) o seleccionar todo,
+o seleccionar una parte (arrastrando el cursor por el texto.
+
+Tambien hay que meter "events" que es basicamente que 
+por ejemplo cuando le cliques al enter estando focuseado en el texto
+le pase una señal y haga algo, por ejemplo comprobar con un texto 
+predeterminado y saber si es la contraseña correcta.
+
+Ejemplo de events:
+Hover
+Unhover
+Clicked
+Released
+InputChanged
+InputSubmit (lo de la contraseña)
+GainFocus
+LoseFocus

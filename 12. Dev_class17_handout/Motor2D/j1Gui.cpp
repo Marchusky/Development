@@ -116,6 +116,8 @@ void j1Gui::Create_Element(Element_type element, iPoint position, SDL_Rect rect,
 	case Element_type::BUTTON:
 		elem = new Gui_Button(element, position, rect, tex);
 		break;
+	case Element_type::INPUTBOX:
+		elem = new Gui_Button(element, position, rect, tex);
 	}
 
 	if (elem != nullptr)
