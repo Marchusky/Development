@@ -1,0 +1,12 @@
+barra lateral (image)
+scroller (image)
+
+movable text (label)
+
+The way we have it programmed,
+we have the text as a texture
+so we only need to change the
+rectangle that gets the text
+texture using the scroller.
+
+Scroll bar -> determines the draw position
