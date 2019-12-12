@@ -1,0 +1,20 @@
+class Command
+	string name
+	nº arguments
+*Every command has a listener
+
+Example:
+
+	"map hello2.tmx"
+	(name) (argument)
+
+separate into parts (the space separates)
+In moduleConsole.cpp compare names with our list and then compare arguments
+
+Then call the listener and do things depending on the argument.
+
+
+Every module can call CreateCommand function in moduleCommand to add commands to the list in that module.
+Example:
+Render calls CreateCommand and creates VSync bool
+Then call function OnCommand
